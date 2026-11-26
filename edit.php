@@ -3,27 +3,27 @@ include "../config.php";
 
 $id = $_GET['id'];
 
-$data = mysqli_fetch_assoc(
-    mysqli_query($con, "SELECT * FROM pelanggan WHERE id_pelanggan='$id'")
+$data = mysqli_query(
+    $con,
+    "SELECT * FROM jenis_pelanggan WHERE id_jenis='$id'"
 );
 
-$jenis = mysqli_query($con, "SELECT * FROM jenis_pelanggan");
+$row = mysqli_fetch_assoc($data);
+
+if (!$row) {
+    die("Data tidak ditemukan");
+}
 
 if (isset($_POST['update'])) {
 
-    $id_jenis = $_POST['id_jenis'];
-    $nama = $_POST['nama_pelanggan'];
-    $alamat = $_POST['alamat'];
-    $no_hp = $_POST['no_handphone'];
+    $jenis = $_POST['jenis'];
 
-    mysqli_query($con, "
-        UPDATE pelanggan SET
-        id_jenis='$id_jenis',
-        nama_pelanggan='$nama',
-        alamat='$alamat',
-        no_handphone='$no_hp'
-        WHERE id_pelanggan='$id'
-    ");
+    mysqli_query(
+        $con,
+        "UPDATE jenis_pelanggan
+         SET jenis='$jenis'
+         WHERE id_jenis='$id'"
+    );
 
     header("Location: index.php");
     exit;
@@ -33,56 +33,26 @@ if (isset($_POST['update'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit Pelanggan</title>
+    <title>Edit Jenis Pelanggan</title>
 </head>
 <body>
 
-<h2>Edit Pelanggan</h2>
+<h2>Edit Jenis Pelanggan</h2>
 
-<form method="POST">
+<form method="post">
 
     <label>Jenis Pelanggan</label><br>
 
-    <select name="id_jenis" required>
-
-        <?php while ($j = mysqli_fetch_assoc($jenis)) { ?>
-
-            <option value="<?= $j['id_jenis']; ?>"
-                <?= $j['id_jenis'] == $data['id_jenis'] ? 'selected' : ''; ?>>
-                <?= $j['jenis']; ?>
-            </option>
-
-        <?php } ?>
-
-    </select>
+    <input
+        type="text"
+        name="jenis"
+        value="<?= htmlspecialchars($row['jenis']); ?>"
+        required
+    >
 
     <br><br>
 
-    <label>Nama Pelanggan</label><br>
-    <input type="text"
-           name="nama_pelanggan"
-           value="<?= $data['nama_pelanggan']; ?>"
-           required>
-
-    <br><br>
-
-    <label>Alamat</label><br>
-    <textarea name="alamat" required><?= $data['alamat']; ?></textarea>
-
-    <br><br>
-
-    <label>No Handphone</label><br>
-    <input type="text"
-           name="no_handphone"
-           value="<?= $data['no_handphone']; ?>"
-           required>
-
-    <br><br>
-
-    <button type="submit" name="update">
-        Update
-    </button>
-
+    <button type="submit" name="update">Update</button>
     <a href="index.php">Kembali</a>
 
 </form>
